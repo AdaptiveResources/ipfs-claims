@@ -10,7 +10,7 @@ Validate data created in the Adaptive Resources claims application.
 ## Testing
 For testing, the claim hash can be added to the constants.js file.
 
-It is important to run get claim data tests`npm test test/test-getClaimData.js`, before performing risk management tests `npm test test/test-riskManagement.js`.
+It is important to run get claim data tests`npm run test-getClaimData`, before performing risk management tests `npm run test-riskMitigation`.
 
 ### Test Scripts
 - getClaimData.js

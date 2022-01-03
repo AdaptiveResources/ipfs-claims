@@ -13,10 +13,8 @@ test('Load a file from the CID and log result:', async function (t) {
         result.creatorLocation &&
         result.image &&
         result.timestamp &&
-        result.supportDirectives['1'] && // at least one support directive
-        result.associatedAddresses["Claim Creator"] &&
-        result.associatedAddresses["Cooperative"] &&
-        result.associatedAddresses["Beneficiaries"],
+        result.riskTreatmentAreas &&
+        result.associatedAddresses,
         ': Data sucessfully loaded, claim recreated for testing'
     );
     console.log("RESULT: ");
@@ -83,6 +81,8 @@ test('Validate data returned:', async function (t) {
             n.end();
         })
 
+        // Not to be implemented yet, currently only requiring OECD Annex II Risk assessment completion
+        /*
         t.test('Require specific cerificates depending on the claims country of origin:', function (r) {
             console.log("certificate: ", result.certification);
             console.log("country :", result.creatorLocation.split(",")[0]);
@@ -94,12 +94,23 @@ test('Validate data returned:', async function (t) {
             console.log("\n");
             r.end();
         })
+        */
 
         t.test('Is the claim creator pre-approved?', function (r) {
-            console.log("claim creator: ", result.associatedAddresses['Claim Creator']);
-            let creator = result.associatedAddresses['Claim Creator'];
-            r.ok(creator == powvt || creator == devsol, ': Claim creator is pre-approved.');
-            r.end();
+            //console.log(result.associatedAddresses[3][0], result.associatedAddresses[3][1]);
+            // if two benes
+            if (result.associatedAddresses[3][0] == 'Exporter/ Claim Creator') {
+                let creator = result.associatedAddresses[3][1];
+                r.ok(creator == powvt || creator == devsol, ': Claim creator is pre-approved.');
+                r.end();
+            }
+            // if one bene
+            if (result.associatedAddresses[2][0] == 'Exporter/ Claim Creator') {
+                let creator = result.associatedAddresses[2][1];
+                r.ok(creator == powvt || creator == devsol, ': Claim creator is pre-approved.');
+                r.end();
+            }
+
         })
     }
 })

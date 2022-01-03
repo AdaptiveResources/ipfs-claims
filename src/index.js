@@ -2,7 +2,7 @@ import fetch from 'node-fetch';
 import fs from 'fs';
 
 // function get data
-export const getClaimData = async (hash) => {
+export async function getClaimData(hash) {
 
     // Claim Parameters
     let claimHash;
@@ -10,11 +10,12 @@ export const getClaimData = async (hash) => {
     let prodID;
     let mass;
     let purity = {};
+    let assessment;
     let certification = {};
     let creatorLocation;
     let image;
     let timestamp;
-    let supportDirectives = {};
+    let riskTreatmentAreas = {};
     let associatedAddresses = {};
     // data set
     let claimData = {};
@@ -30,7 +31,7 @@ export const getClaimData = async (hash) => {
         //hash
         claimHash = hash;
         //commodity
-        commodity = splitSpace[3].split(":")[1].slice(1)
+        commodity = splitSpace[3].split(":")[1].slice(1);
         //productID
         prodID = splitSpace[5].split(":")[1].valueOf().slice(1);
         //mass
@@ -40,7 +41,7 @@ export const getClaimData = async (hash) => {
         let pure = purityWhole.split(",");
         for (let i = 0; i < pure.length; i++) {
             let element = pure[i].split(")")[0] + ")";
-            let percent = pure[i].split(")")[1].slice(1);
+            let percent = pure[i].split(")")[1];
             if (i == 0) {
                 purity[element.slice(2)] = percent;
             } else {
@@ -48,9 +49,15 @@ export const getClaimData = async (hash) => {
             }
 
         }
-
+        //Risk Assessment Completed:
+        let riskAssessment = splitSpace[11].split(":")[1].slice(1)
+        if (riskAssessment == 'Yes') {
+            assessment = true;
+        } else {
+            assessment = false;
+        }
         //certification
-        let certWhole = splitSpace[11].split(":")[1];
+        let certWhole = splitSpace[13].split(":")[1];
         let cert = certWhole.split(" ");
         let certNum = cert[cert.length - 1];
         let certName;
@@ -72,40 +79,58 @@ export const getClaimData = async (hash) => {
         }
         certification[certName] = certNum
         //creator location
-        creatorLocation = splitSpace[13].split(":")[1].slice(1);
+        creatorLocation = splitSpace[15].split(":")[1].slice(1);
         //image
-        image = 'https:' + splitSpace[15].split(":")[2]
+        image = 'https:' + splitSpace[17].split(":")[2]
         //timestamp
-        timestamp = (splitSpace[17].split(":")[1] + ":" + splitSpace[17].split(":")[2] + ":" + splitSpace[17].split(":")[3]).slice(1);
+        timestamp = (splitSpace[19].split(":")[1] + ":" + splitSpace[19].split(":")[2] + ":" + splitSpace[19].split(":")[3]).slice(1);
         //minesite directives
-        if (splitSpace[20]) {
-            supportDirectives[1] = splitSpace[20].split("          ")[1]
+        if (splitSpace[22].split("-")[1].slice(1) == "Mining Operator/ Cooperative: ") {
+            let name = splitSpace[23].split(':')[0].split(',')[0].split("              ")[1];
+            let dir = splitSpace[23].split(':')[1].slice(1);
+            riskTreatmentAreas[0] = [name, dir];
         }
-        if (splitSpace[21]) {
-            supportDirectives[2] = splitSpace[21].split("          ")[1]
-        }
-        if (splitSpace[22]) {
-            supportDirectives[3] = splitSpace[22].split("          ")[1]
-        }
-        //wallet addresses
-        if (splitSpace[25]) {
-            let name1 = splitSpace[25].split(":")[0];
-            let name1S = name1.split("          ")[1];
-            let address1 = splitSpace[25].split(":")[1].slice(1);
-            associatedAddresses[name1S] = address1
+        if (splitSpace[24].split("-")[1].slice(1) == "Mining Operator/ Cooperative: ") {
+            let name = splitSpace[25].split(':')[0].split(',')[0].split("              ")[1];
+            let dir = splitSpace[25].split(':')[1].slice(1);
+            riskTreatmentAreas[1] = [name, dir];
         }
         if (splitSpace[26]) {
-            let name2 = splitSpace[26].split(":")[0];
-            let name2S = name2.split("         ")[1].slice(1);
-            let address2 = splitSpace[26].split(":")[1].slice(1);
-            associatedAddresses[name2S] = address2
+            let name = splitSpace[27].split(':')[0].split(',')[0].split("              ")[1];
+            let dir = splitSpace[27].split(":")[1].slice(1);
+            riskTreatmentAreas[2] = [name, dir];
         }
-        if (splitSpace[27]) {
-            let name3 = splitSpace[27].split(":")[0];
-            let name3S = name3.split("         ")[1].slice(1);
-            let address3 = splitSpace[27].split(":")[1];
-            associatedAddresses[name3S] = address3.slice(1)
+        if (splitSpace[28]) {
+            let name = splitSpace[28].split('-')[1].split(":")[0].slice(1);
+            let dir = splitSpace[28].split('-')[1].split(":")[1];
+            riskTreatmentAreas[3] = [name, dir];
         }
+        //wallet addresses
+        // {1:[name,addres], 2:[name,address], ...}
+        // Risk Beneficiary 1
+        if (splitSpace[32]) {
+            let name1 = splitSpace[32].split(":")[0].split("-")[1].split(",")[0];
+            let address1 = splitSpace[32].split(":")[1].slice(1);
+            associatedAddresses[0] = [name1, address1]
+        }
+        // Risk Beneficiary 2
+        if (splitSpace[33]) {
+            let name1 = splitSpace[33].split(":")[0].split("-")[1].split(",")[0];
+            let address1 = splitSpace[33].split(":")[1].slice(1);
+            associatedAddresses[1] = [name1, address1]
+        }
+        // Cooperative
+        if (splitSpace[35]) {
+            let name1 = splitSpace[35].split(":")[0].split("-")[1].split(",")[0].slice(1);
+            let address1 = splitSpace[35].split(":")[1].slice(1);
+            associatedAddresses[2] = [name1, address1]
+        }
+        // Exporter/ Claim Creator
+        if (splitSpace[36]) {
+            let address1 = splitSpace[36].split(":")[1].slice(1);
+            associatedAddresses[3] = ['Exporter/ Claim Creator', address1]
+        }
+
         // claim data object
         claimData = {
             hash: claimHash,
@@ -113,11 +138,12 @@ export const getClaimData = async (hash) => {
             productId: prodID,
             mass: mass,
             purity: purity,
+            assessment: assessment,
             certification: certification,
             creatorLocation: creatorLocation,
             image: image,
             timestamp: timestamp,
-            supportDirectives: supportDirectives,
+            riskTreatmentAreas: riskTreatmentAreas,
             associatedAddresses: associatedAddresses
         }
         // if claim data complete, then return data in the form of an object and create a local desktop file of the results. 
@@ -127,26 +153,14 @@ export const getClaimData = async (hash) => {
             claimData.productId &&
             claimData.mass &&
             claimData.purity &&
+            claimData.assessment &&
             claimData.creatorLocation &&
             claimData.image &&
             claimData.timestamp &&
-            claimData.supportDirectives &&
+            claimData.riskTreatmentAreas &&
             claimData.associatedAddresses) {
-            // Write results to desktop report
-            fs.writeFile("../Desktop/" + claimHash + ".txt", JSON.stringify(claimData), (err) => {
-                if (err)
-                    console.log(err);
-                else {
-                    console.log("\nClaim Data written successfully to user desktop.\n");
-                    //console.log("The written has the following contents:");
-                    //console.log(fs.readFileSync("../Desktop/" + claimHash + ".txt", "utf8"));
-                }
-            });
-
             return claimData
-        }
-
-        else {
+        } else {
             console.log("Claim Data is in unusual format.")
         }
         // if there is a message with type error that is returned from fetch, trigger console.error
@@ -157,7 +171,7 @@ export const getClaimData = async (hash) => {
 }
 
 // Write results to desktop report
-export const writeToDesktop = (claimHash, claimData) => {
+export function writeToDesktop(claimHash, claimData) {
     /*
     fs.readdir(folderPath, (err, files) => {
         files.forEach(file => {

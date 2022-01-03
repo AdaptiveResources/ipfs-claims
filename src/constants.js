@@ -1,5 +1,5 @@
 // Test claims
-export const correctHash = 'QmeMsKNL8kecNP8oxifmYYT9oN6tbTV8awpuRos11Th3Zy';
+export const correctHash = 'Qme1kaxuWFMLP1AuMNEMDV9UqeNXmvZydNseZx7N61RCdP';
 export const incorrectHash = 'QmZE6UqKuRSf7qKFDoECYcKCSSTgRGMjcUYczVwnfsmw8';
 
 // Current price of commodities

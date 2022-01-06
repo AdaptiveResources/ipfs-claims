@@ -1,12 +1,13 @@
 {
   "name": "ipfs-claims",
-  "version": "1.0.0",
-  "description": "Validate Adaptive Resources claim token data stored on IPFS",
+  "version": "0.1.0",
+  "description": "Validate and retrieve Adaptive Claims (AC) token data stored on IPFS.",
   "main": "index.js",
   "type": "module",
   "scripts": {
     "test-getClaimData": "node test/getClaimData.js",
-    "test-riskMitigation": "node test/riskMitigation.js"
+    "test-riskMitigation": "node test/riskMitigation.js",
+    "test-complete": "node test/complete.js"
   },
   "repository": {
     "type": "git",
@@ -17,7 +18,7 @@
     "claims",
     "adaptive",
     "resources",
-    "defi"
+    "supply chain"
   ],
   "author": "PowVT",
   "license": "MIT",

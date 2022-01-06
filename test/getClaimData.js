@@ -4,19 +4,8 @@ import { correctHash, incorrectHash, goldPrice, tantalumPrice, powvt, devsol } f
 
 // test 1
 test('Load a file from the CID and log result:', async function (t) {
+
     let result = await getClaimData(correctHash);
-    t.ok(
-        result.commodity &&
-        result.mass &&
-        result.purity &&
-        result.productId &&
-        result.creatorLocation &&
-        result.image &&
-        result.timestamp &&
-        result.riskTreatmentAreas &&
-        result.associatedAddresses,
-        ': Data sucessfully loaded, claim recreated for testing'
-    );
     console.log("RESULT: ");
     console.log(result);
     console.log("\n");
@@ -66,7 +55,7 @@ test('Validate data returned:', async function (t) {
                 n.ok(tokenPrice <= 10000, ': Token price less than 10,000 USD.');
                 console.log("\n");
             }
-            if (result.commodity == "Tantalum (Ta)") {
+            if (result.commodity == "Tantalum (Ta)" || result.commodity == "Tin (Sn)" || result.commodity == "Cobalt (Co)" || result.commodity == "Mica") {
                 let m = result.mass;
                 let p = result.purity[result.commodity].split("%")[0];
                 let mp = m * (p / 100);

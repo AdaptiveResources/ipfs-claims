@@ -21,7 +21,7 @@ test('Load a file from the CID and log result:', async function (t) {
         result.mass &&
         result.purity &&
         result.productId &&
-        result.creatorLocation &&
+        result.productionLocation &&
         result.image &&
         result.timestamp &&
         result.riskTreatmentAreas &&

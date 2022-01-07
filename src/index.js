@@ -1,9 +1,22 @@
 import fetch from 'node-fetch';
 import fs from 'fs';
-import { correctHash, incorrectHash, goldPrice, tantalumPrice, powvt, devsol, ugandaRedCross, ugandaCooperative, mubendeHumanRights, kassandaChildrensAid } from "../src/constants.js";
-
+import { correctHash, incorrectHash, goldPrice, tantalumPrice, powvt, devsol, ugandaRedCross, ugandaCooperative, mubendeHumanRights, kassandaChildrensAid, beneApprovalList } from "../src/constants.js";
+import isIPFS from 'is-ipfs'
 
 // risk mitigation functions
+/*
+#### Claim Tests
+1. Is the commodity approved for trading?
+2. Verify more than one purity to be submitted.
+    - Verify the purity percents total less than or equal to 100%.
+3. Verify commodity value and token price is accurate.
+    - Is this price less than 10,000 USD?
+4. Require claim creator to be pre-approved.
+5. Are beneficiaries in claim pre-approved?
+    - Is the beneficiary approved to respond to the directives selected?
+6. Is one or more risk treatment areas recorded in claim?
+7. Is image hash valid?
+*/
 
 //purity tests
 function purityTest(claimData) {
@@ -33,7 +46,8 @@ function valueTest(claimData) {
         let mp = m * (p / 100);
         let pricePerGramGold = mp * goldPrice;
         let tokenPrice = pricePerGramGold / 10;
-        if (tokenPrice <= 10000) {
+
+        if (tokenPrice < 10000) {
             return true;
         } else {
             return false;
@@ -45,11 +59,15 @@ function valueTest(claimData) {
         let mp = m * (p / 100);
         let pricePergramTantalum = mp * tantalumPrice;
         let tokenPrice = pricePergramTantalum / 10;
-        if (tokenPrice <= 10000) {
+
+        if (tokenPrice < 10000) {
             return true;
         } else {
             return false;
         }
+    }
+    else {
+        return false
     }
 }
 
@@ -72,6 +90,9 @@ function creatorPreApprovedTest(claimData) {
         } else {
             return false
         }
+    }
+    else {
+        return false
     }
 }
 
@@ -117,8 +138,51 @@ function beneficiaryPreApprovedTest(claimData) {
     }
 }
 
+// are the beneficiaries approved for these risk treatment areas?
+function beneficiaryRTATest(claimData) {
+    let approvalSwitch = false;
+    let beneArray = claimData.associatedAddresses
+    if (beneArray[3]) {
+        // 4 address in array only parse first two.
+        for (let i = 0; i < 2; i++) {
+            if (beneApprovalList[beneArray[i][1]]) {
+                approvalSwitch = true;
+            } else {
+                approvalSwitch = false;
+            }
+            //console.log(claimData.riskTreatmentAreas[i][1].split(',')[1].slice(1))
+            //console.log(claimData.riskTreatmentAreas[i][1].split(',')[0])
+            //console.log(beneApprovalList[beneArray[i][1]])
+        }
+    } else {
+        // 3 address in array only parse first entry.
+        if (beneApprovalList[beneArray[0][1]]) {
+            approvalSwitch = true;
+        } else {
+            approvalSwitch = false;
+        }
+    }
 
-// returns claim data as an object
+    if (approvalSwitch == true) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+// using is-ipfs library, is the hash valid?
+function imageHashTest(claimData) {
+    //console.log(claimData.image.split('/')[4])
+    let result = isIPFS.ipfsUrl(claimData.image);
+    if (result == true) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+// returns claim data as an object, if all fields filled properly.
+// for pre-flight checks
 export async function getClaimData(hash) {
     // Claim Parameters
     let claimHash;
@@ -128,7 +192,7 @@ export async function getClaimData(hash) {
     let purity = {};
     let assessment;
     let certification = {};
-    let creatorLocation;
+    let productionLocation;
     let image;
     let timestamp;
     let riskTreatmentAreas = {};
@@ -195,8 +259,8 @@ export async function getClaimData(hash) {
                 }
             }
             certification[certName] = certNum
-            //creator location
-            creatorLocation = splitSpace[15].split(":")[1].slice(1);
+            //production location
+            productionLocation = splitSpace[15].split(":")[1].slice(1);
             //image
             image = 'https:' + splitSpace[17].split(":")[2]
             //timestamp
@@ -257,7 +321,7 @@ export async function getClaimData(hash) {
                 purity: purity,
                 assessment: assessment,
                 certification: certification,
-                creatorLocation: creatorLocation,
+                productionLocation: productionLocation,
                 image: image,
                 timestamp: timestamp,
                 riskTreatmentAreas: riskTreatmentAreas,
@@ -265,7 +329,7 @@ export async function getClaimData(hash) {
             }
             // Invalid claim format.
         } catch {
-            console.error("Claim Data is in unusual format.")
+            return {};
         }
 
         // if claim data complete, then return data in the form of an object and create a local desktop file of the results. 
@@ -276,17 +340,17 @@ export async function getClaimData(hash) {
             claimData.mass &&
             claimData.purity &&
             claimData.assessment &&
-            claimData.creatorLocation &&
+            claimData.productionLocation &&
             claimData.image &&
             claimData.timestamp &&
             claimData.riskTreatmentAreas &&
             claimData.associatedAddresses
         ) {
 
-            return claimData
+            return claimData;
 
         } else {
-            console.log("Claim Data is in unusual format.")
+            return {};
         }
         // if there is a message with type error that is returned from fetch, trigger console.error
     } else {
@@ -296,28 +360,28 @@ export async function getClaimData(hash) {
 
 // Pass valid claim data. Will return true if the data passes all tests. Will return false otherwise.
 export function riskMitigation(claimData) {
-    const p = purityTest(claimData);
-    const v = valueTest(claimData);
-    const c = creatorPreApprovedTest(claimData);
-    const b = beneficiaryPreApprovedTest(claimData);
-    //const r = rtaTest(claimData);
-
-    if (p, v, c, b == true) {
+    let p, v, c, b, a, i;
+    try {
+        p = purityTest(claimData);
+        v = valueTest(claimData);
+        c = creatorPreApprovedTest(claimData);
+        b = beneficiaryPreApprovedTest(claimData);
+        a = beneficiaryRTATest(claimData);
+        i = imageHashTest(claimData)
+    } catch {
+        return false
+    }
+    // if values are returned for are individual test, check that all are true, meaning passing
+    if (p, v, c, b, a, i == true) {
         return true
     } else {
         return false
     }
 }
 
-// Write results to desktop report
+// Write results to desktop report (coming in v2)
+/*
 export function writeToDesktop(claimHash, claimData) {
-    /*
-    fs.readdir(folderPath, (err, files) => {
-        files.forEach(file => {
-            console.log(file);
-        });
-    });
-    */
     fs.writeFile(claimHash + ".txt", claimData, (err) => {
         if (err)
             console.log(err);
@@ -328,5 +392,5 @@ export function writeToDesktop(claimHash, claimData) {
         }
     });
 }
-
+*/
 

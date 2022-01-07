@@ -2,7 +2,7 @@ import test from 'tape';
 import { getClaimData } from "../src/index.js";
 import { correctHash, incorrectHash, goldPrice, tantalumPrice, powvt, devsol } from "../src/constants.js";
 
-// test 1
+// pre-flight check
 test('Load a file from the CID and log result:', async function (t) {
 
     let result = await getClaimData(correctHash);
@@ -11,7 +11,7 @@ test('Load a file from the CID and log result:', async function (t) {
     console.log("\n");
 })
 
-// test 2
+// tests
 test('Validate data returned:', async function (t) {
     let result = await getClaimData(correctHash);
 
@@ -74,9 +74,9 @@ test('Validate data returned:', async function (t) {
         /*
         t.test('Require specific cerificates depending on the claims country of origin:', function (r) {
             console.log("certificate: ", result.certification);
-            console.log("country :", result.creatorLocation.split(",")[0]);
+            console.log("country :", result.productionLocation.split(",")[0]);
             let cert = result.certification;
-            let origin = result.creatorLocation.split(",")[0];
+            let origin = result.productionLocation.split(",")[0];
             if (origin == "Uganda") {
                 r.ok(cert['ICGLR Certificate'], ': Correct certificate.');
             }

@@ -1,8 +1,8 @@
 {
   "name": "ipfs-claims",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Validate and retrieve Adaptive Claims (AC) token data stored on IPFS.",
-  "main": "index.js",
+  "main": "src/index.js",
   "type": "module",
   "scripts": {
     "test-getClaimData": "node test/getClaimData.js",
@@ -28,6 +28,7 @@
   "homepage": "https://github.com/PowVT/ipfs-claims#readme",
   "dependencies": {
     "ipfs-core": "^0.12.2",
+    "is-ipfs": "^6.0.2",
     "node-fetch": "^3.1.0"
   },
   "devDependencies": {

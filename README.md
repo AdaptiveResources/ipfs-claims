@@ -48,12 +48,12 @@ npm run test-complete
 ```
 
 ## Current Version
-0.1.1 - Initial release, under partnership with The Filecoin Foundation.
+0.1.2 - Initial release, under partnership with The Filecoin Foundation.
 
 ### Version Schema
 * 0.1.1, initial release
-* 0.1.2, updates to beneficiary approvals
-* 0.2.1, update to risk mitigation functionality
+* 0.1.2, updates to beneficiary approvals or other small syntax edits
+* 0.2.1, update to risk mitigation functionality or other large functionality edits
 
 ## License
 * MIT ([LICENSE-MIT](LICENSE-MIT) / http://opensource.org/licenses/MIT)

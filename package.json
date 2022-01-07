@@ -1,6 +1,6 @@
 {
   "name": "ipfs-claims",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Validate and retrieve Adaptive Claims (AC) token data stored on IPFS.",
   "main": "src/index.js",
   "type": "module",

@@ -8,9 +8,11 @@ npm i ipfs-claims
 ## Usage
 Library in JS
 ```
-const claims = require ('ipfs-claims');
-const data = await claims.getClaimData(<IPFS hash>);
-const result = await claims.riskMitigation(data); // pass = true, fail = false
+import { getClaimData, riskMitigation } from 'ipfs-claims';
+
+const data = await getClaimData(claimHash);
+const result = riskMitigation(data);
+console.log(result); // pass = true, fail = false
 
 // write to desktop
 const data = await claims.getClaimData(<IPFS hash>);

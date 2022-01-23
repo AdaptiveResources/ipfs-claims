@@ -35,7 +35,7 @@ npm start
 ## Testing
 For testing, a claim hash should be added to the `constants.js` file of the desired claim token you want to trace.
 
-It is important to run get claim data tests`npm run test-getClaimData`, before performing risk management tests `npm run test-riskMitigation`. This way if the first test fails you know there are major red flags in the claim token. The second script contains more detailed tests. Finally, `npm run test-complete` will run the two tests sequentially. 
+It is important to run get claim data tests `npm run test-getClaimData` before performing risk management tests `npm run test-riskMitigation`. This way if the first test fails you know there are red flags in the claim token data format. The second script contains more detailed tests on the claim data. Finally, `npm run test-complete` will run the two tests sequentially. 
 
 ### Test Scripts
 - `getClaimData.js`
@@ -50,7 +50,7 @@ npm run test-complete
 ```
 
 ## Current Version
-0.1.2 - Initial release, under partnership with The Filecoin Foundation.
+0.2.0 - Command line interface added. Paste in the AC token URI or claim hash. 
 
 ### Version Schema
 * 0.1.1, initial release

@@ -1,6 +1,17 @@
 import fetch from 'node-fetch';
 import fs from 'fs';
-import { correctHash, incorrectHash, goldPrice, tantalumPrice, powvt, devsol, ugandaRedCross, ugandaCooperative, mubendeHumanRights, kassandaChildrensAid, beneApprovalList } from "../src/constants.js";
+import {
+    correctHash,
+    incorrectHash,
+    goldPrice,
+    tantalumPrice,
+    powvt, devsol,
+    ugandaRedCross,
+    ugandaCooperative,
+    mubendeHumanRights,
+    kassandaChildrensAid,
+    beneApprovalList
+} from "../src/constants.js";
 import isIPFS from 'is-ipfs'
 
 // risk mitigation functions
@@ -184,6 +195,10 @@ function imageHashTest(claimData) {
 // returns claim data as an object, if all fields filled properly.
 // for pre-flight checks
 export async function getClaimData(hash) {
+    // Beneficiary fetch data
+    //let beneArray = await fetchBeneficiaries();
+    //console.log(beneArray);
+
     // Claim Parameters
     let claimHash;
     let commodity;

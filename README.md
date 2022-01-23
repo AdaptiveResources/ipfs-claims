@@ -21,7 +21,9 @@ const report = claim.writeToDesktop(<IPFS hash>, data)
 
 From the command line
 
- * TO-DO:
+```
+npm start
+```
 
 ### Exported Functions
 - `getClaimData(IPFS_Hash)` 
